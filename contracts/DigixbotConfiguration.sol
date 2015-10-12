@@ -27,19 +27,23 @@ contract DigixbotConfiguration {
     locked = false;
   }
 
+  function getOwner() public constant returns (address) {
+    return owner;
+  }
+
   function setBotContract(address _botcontract) ifowner unlesslocked {
     botcontract = _botcontract;
   }
   
-  function getBotContract() public constant returns (address _bca) {
-    _bca = botcontract;
+  function getBotContract() public returns (address) {
+    return botcontract;
   }
 
   function setUsersContract(address _userscontract) ifowner unlesslocked {
     userscontract = _userscontract;
   }
 
-  function getUsersContract() public constant returns (address _uca) {
+  function getUsersContract() public returns (address _uca) {
     _uca = userscontract;
   }
 

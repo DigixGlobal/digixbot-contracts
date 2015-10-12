@@ -1,12 +1,9 @@
-require 'ethereum'
-require 'securerandom'
-client = Ethereum::HttpClient.new("172.16.135.110", "8545")
-contract_init = Ethereum::Initializer.new("#{ENV['PWD']}/contracts/DigixbotConfiguration.sol", client)
-contract_init.build_all
+RSpec.describe "DigixbotConfiguration" do
 
-RSpec.describe DigixbotConfiguration do
-
-  before(:context) do
+  before(:all) do
+    @client = Ethereum::HttpClient.new("172.16.135.110", "8545")
+    @contract_init = Ethereum::Initializer.new("#{ENV['PWD']}/contracts/DigixbotConfiguration.sol", @client)
+    @contract_init.build_all
     @etw = DigixbotConfiguration.new
     @etw.deploy_and_wait
     @accounts = @etw.connection.accounts["result"]
@@ -18,10 +15,18 @@ RSpec.describe DigixbotConfiguration do
     @formatter = Ethereum::Formatter.new
   end
 
-  describe "Contract Code" do
+  describe "Contract Construction and Deployment" do
+
     it "Should produce a correct binary after deployment" do
       expect(@etw.deployment.valid_deployment).to be(true)
     end
+
+    describe "getOwner()" do
+      it "Should set the deployer as owner at deployment" do
+        expect(true).to be(true)
+      end
+    end
+
   end
 
   describe "Contract Functions" do
@@ -30,15 +35,13 @@ RSpec.describe DigixbotConfiguration do
 
       it "should set the botcontract variable to @coinbase" do
         @etw.transact_and_wait_set_bot_contract(@coinbase)
-        formatted_result = @formatter.to_address(@etw.call_get_bot_contract[:raw])
-        expect(formatted_result).to eq(@coinbase)
+        expect(@etw.call_get_bot_contract[:formatted][0]).to eq(@coinbase)
       end
 
       it "should only allow owner to call it" do
         @etw.as(@user1)
         @etw.transact_and_wait_set_bot_contract(@user1)
-        formatted_result = @formatter.to_address(@etw.call_get_bot_contract[:raw])
-        expect(formatted_result).to eq(@coinbase)
+        expect(@etw.call_get_bot_contract[:formatted][0]).to eq(@coinbase)
       end
 
     end
@@ -48,15 +51,13 @@ RSpec.describe DigixbotConfiguration do
       it "should set the userscontract to @user2" do
         @etw.as(@coinbase)
         @etw.transact_and_wait_set_users_contract(@user2)
-        formatted_result = @formatter.to_address(@etw.call_get_users_contract[:raw])
-        expect(formatted_result).to eq(@user2)
+        expect(@etw.call_get_users_contract[:formatted][0]).to eq(@user2)
       end
 
       it "should only allow owner to call it" do
         @etw.as(@user1)
         @etw.transact_and_wait_set_bot_contract(@user1)
-        formatted_result = @formatter.to_address(@etw.call_get_users_contract[:raw])
-        expect(formatted_result).to eq(@user2)
+        expect(@etw.call_get_users_contract[:formatted][0]).to eq(@user2)
       end
 
     end
@@ -74,8 +75,7 @@ RSpec.describe DigixbotConfiguration do
         it "should check if configuration is locked" do
           @etw.as(@coinbase)
           @etw.transact_and_wait_set_bot_contract(@user1)
-          formatted_result = @formatter.to_address(@etw.call_get_bot_contract[:raw])
-          expect(formatted_result).not_to eq(@user1)
+          expect(@etw.call_get_bot_contract[:formatted][0]).not_to eq(@user1)
         end
 
       end
@@ -85,8 +85,7 @@ RSpec.describe DigixbotConfiguration do
         it "should check if configuration is locked" do
           @etw.as(@coinbase)
           @etw.transact_and_wait_set_users_contract(@user3)
-          formatted_result = @formatter.to_address(@etw.call_get_users_contract[:raw])
-          expect(formatted_result).not_to eq(@user3)
+          expect(@etw.call_get_users_contract[:formatted][0]).not_to eq(@user3)
         end
 
       end
@@ -98,23 +97,18 @@ RSpec.describe DigixbotConfiguration do
       it "should add a new currency" do
         @etw.as(@coinbase)
         @etw.transact_and_wait_add_currency("eth", @user3)
-        formatted_result = @formatter.to_address(@etw.call_get_currency_wallet("eth")[:raw])
-        expect(formatted_result).to eq(@user3)
+        expect(@etw.call_get_currency_wallet("eth")[:formatted][0]).to eq(@user3)
       end
 
       it "should not add an existing currency" do
         @etw.as(@coinbase)
         @etw.transact_and_wait_add_currency("eth", @user1)
-        formatted_result = @formatter.to_address(@etw.call_get_currency_wallet("eth")[:raw])
-        expect(formatted_result).not_to eq(@user1)
+        expect(@etw.call_get_currency_wallet("eth")[:formatted][0]).not_to eq(@user1)
         @etw.transact_and_wait_add_currency("dgx", @user3)
-        formatted_result = @formatter.to_address(@etw.call_get_currency_wallet("dgx")[:raw])
-        expect(formatted_result).to eq(@user3)
+        expect(@etw.call_get_currency_wallet("dgx")[:formatted][0]).to eq(@user3)
       end
 
     end
-
-
 
   end
 

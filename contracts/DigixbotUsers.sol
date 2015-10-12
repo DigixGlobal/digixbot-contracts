@@ -1,3 +1,15 @@
+contract DigixbotConfiguration {
+  function DigixbotConfiguration();
+  function lockConfiguration();
+  function getBotContract() returns(address );
+  function getCurrencyWallet(bytes4 _currency) constant returns(address _ca);
+  function getOwner()constant returns(address );
+  function setUsersContract(address _userscontract);
+  function getUsersContract()returns(address _uca);
+  function setBotContract(address _botcontract);
+  function addCurrency(bytes4 _name,address _wallet);
+}
+
 contract DigixbotUsers {
 
   struct User {
@@ -19,8 +31,16 @@ contract DigixbotUsers {
     config = _config;
   }
 
+  function getOwner() public returns (address) {
+    return owner;
+  }
+
+  function getConfig() public returns (address) {
+    return config;
+  }
+
   function getBotContract() public returns (address) {
-    address(config).call("0f8b70c9");
+    return DigixbotConfiguration(config).getBotContract();
   }
 
   modifier ifowner { if (msg.sender == owner) _ }
