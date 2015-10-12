@@ -4,9 +4,9 @@ RSpec.describe "DigixbotConfiguration" do
     @client = Ethereum::HttpClient.new("172.16.135.110", "8545")
     @contract_init = Ethereum::Initializer.new("#{ENV['PWD']}/contracts/DigixbotConfiguration.sol", @client)
     @contract_init.build_all
-    @etw = DigixbotConfiguration.new
-    @etw.deploy_and_wait
-    @accounts = @etw.connection.accounts["result"]
+    @digixbotconfiguration = DigixbotConfiguration.new
+    @digixbotconfiguration.deploy_and_wait
+    @accounts = @digixbotconfiguration.connection.accounts["result"]
     @coinbase = @accounts[0]
     @user1 = @accounts[1]
     @user2 = @accounts[2]
@@ -18,7 +18,7 @@ RSpec.describe "DigixbotConfiguration" do
   describe "Contract Construction and Deployment" do
 
     it "Should produce a correct binary after deployment" do
-      expect(@etw.deployment.valid_deployment).to be(true)
+      expect(@digixbotconfiguration.deployment.valid_deployment).to be(true)
     end
 
     describe "getOwner()" do
@@ -34,14 +34,14 @@ RSpec.describe "DigixbotConfiguration" do
     describe "setBotContract() and getBotContract()" do
 
       it "should set the botcontract variable to @coinbase" do
-        @etw.transact_and_wait_set_bot_contract(@coinbase)
-        expect(@etw.call_get_bot_contract[:formatted][0]).to eq(@coinbase)
+        @digixbotconfiguration.transact_and_wait_set_bot_contract(@coinbase)
+        expect(@digixbotconfiguration.call_get_bot_contract[:formatted][0]).to eq(@coinbase)
       end
 
       it "should only allow owner to call it" do
-        @etw.as(@user1)
-        @etw.transact_and_wait_set_bot_contract(@user1)
-        expect(@etw.call_get_bot_contract[:formatted][0]).to eq(@coinbase)
+        @digixbotconfiguration.as(@user1)
+        @digixbotconfiguration.transact_and_wait_set_bot_contract(@user1)
+        expect(@digixbotconfiguration.call_get_bot_contract[:formatted][0]).to eq(@coinbase)
       end
 
     end
@@ -49,15 +49,15 @@ RSpec.describe "DigixbotConfiguration" do
     describe "setUsersContract() and getUsersContract()" do
 
       it "should set the userscontract to @user2" do
-        @etw.as(@coinbase)
-        @etw.transact_and_wait_set_users_contract(@user2)
-        expect(@etw.call_get_users_contract[:formatted][0]).to eq(@user2)
+        @digixbotconfiguration.as(@coinbase)
+        @digixbotconfiguration.transact_and_wait_set_users_contract(@user2)
+        expect(@digixbotconfiguration.call_get_users_contract[:formatted][0]).to eq(@user2)
       end
 
       it "should only allow owner to call it" do
-        @etw.as(@user1)
-        @etw.transact_and_wait_set_bot_contract(@user1)
-        expect(@etw.call_get_users_contract[:formatted][0]).to eq(@user2)
+        @digixbotconfiguration.as(@user1)
+        @digixbotconfiguration.transact_and_wait_set_bot_contract(@user1)
+        expect(@digixbotconfiguration.call_get_users_contract[:formatted][0]).to eq(@user2)
       end
 
     end
@@ -65,17 +65,17 @@ RSpec.describe "DigixbotConfiguration" do
     describe "lockConfiguration()" do
 
       it "should lock the configuration" do
-        @etw.as(@coinbase)
-        transaction = @etw.transact_and_wait_lock_configuration
+        @digixbotconfiguration.as(@coinbase)
+        transaction = @digixbotconfiguration.transact_and_wait_lock_configuration
         expect(transaction.class).to be(Ethereum::Transaction)
       end
 
       describe "setBotContract()" do
 
         it "should check if configuration is locked" do
-          @etw.as(@coinbase)
-          @etw.transact_and_wait_set_bot_contract(@user1)
-          expect(@etw.call_get_bot_contract[:formatted][0]).not_to eq(@user1)
+          @digixbotconfiguration.as(@coinbase)
+          @digixbotconfiguration.transact_and_wait_set_bot_contract(@user1)
+          expect(@digixbotconfiguration.call_get_bot_contract[:formatted][0]).not_to eq(@user1)
         end
 
       end
@@ -83,9 +83,9 @@ RSpec.describe "DigixbotConfiguration" do
       describe "setUsersContract()" do
 
         it "should check if configuration is locked" do
-          @etw.as(@coinbase)
-          @etw.transact_and_wait_set_users_contract(@user3)
-          expect(@etw.call_get_users_contract[:formatted][0]).not_to eq(@user3)
+          @digixbotconfiguration.as(@coinbase)
+          @digixbotconfiguration.transact_and_wait_set_users_contract(@user3)
+          expect(@digixbotconfiguration.call_get_users_contract[:formatted][0]).not_to eq(@user3)
         end
 
       end
@@ -95,17 +95,17 @@ RSpec.describe "DigixbotConfiguration" do
     describe "addCurrency() and getCurrencyWallet()" do
 
       it "should add a new currency" do
-        @etw.as(@coinbase)
-        @etw.transact_and_wait_add_currency("eth", @user3)
-        expect(@etw.call_get_currency_wallet("eth")[:formatted][0]).to eq(@user3)
+        @digixbotconfiguration.as(@coinbase)
+        @digixbotconfiguration.transact_and_wait_add_currency("eth", @user3)
+        expect(@digixbotconfiguration.call_get_currency_wallet("eth")[:formatted][0]).to eq(@user3)
       end
 
       it "should not add an existing currency" do
-        @etw.as(@coinbase)
-        @etw.transact_and_wait_add_currency("eth", @user1)
-        expect(@etw.call_get_currency_wallet("eth")[:formatted][0]).not_to eq(@user1)
-        @etw.transact_and_wait_add_currency("dgx", @user3)
-        expect(@etw.call_get_currency_wallet("dgx")[:formatted][0]).to eq(@user3)
+        @digixbotconfiguration.as(@coinbase)
+        @digixbotconfiguration.transact_and_wait_add_currency("eth", @user1)
+        expect(@digixbotconfiguration.call_get_currency_wallet("eth")[:formatted][0]).not_to eq(@user1)
+        @digixbotconfiguration.transact_and_wait_add_currency("dgx", @user3)
+        expect(@digixbotconfiguration.call_get_currency_wallet("dgx")[:formatted][0]).to eq(@user3)
       end
 
     end
