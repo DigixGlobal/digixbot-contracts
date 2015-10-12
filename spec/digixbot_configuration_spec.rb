@@ -93,6 +93,29 @@ RSpec.describe DigixbotConfiguration do
 
     end
 
+    describe "addCurrency() and getCurrencyWallet()" do
+
+      it "should add a new currency" do
+        @etw.as(@coinbase)
+        @etw.transact_and_wait_add_currency("eth", @user3)
+        formatted_result = @formatter.to_address(@etw.call_get_currency_wallet("eth")[:raw])
+        expect(formatted_result).to eq(@user3)
+      end
+
+      it "should not add an existing currency" do
+        @etw.as(@coinbase)
+        @etw.transact_and_wait_add_currency("eth", @user1)
+        formatted_result = @formatter.to_address(@etw.call_get_currency_wallet("eth")[:raw])
+        expect(formatted_result).not_to eq(@user1)
+        @etw.transact_and_wait_add_currency("dgx", @user3)
+        formatted_result = @formatter.to_address(@etw.call_get_currency_wallet("dgx")[:raw])
+        expect(formatted_result).to eq(@user3)
+      end
+
+    end
+
+
+
   end
 
 end
