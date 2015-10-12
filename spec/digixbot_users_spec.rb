@@ -2,12 +2,12 @@ RSpec.describe "DigixbotUsers" do
 
   before(:all) do
     @client = Ethereum::HttpClient.new("172.16.135.110", "8545")
-    @contract_init1 = Ethereum::Initializer.new("#{ENV["PWD"]}/contracts/DigixbotUsers.sol", @client)
+    @contract_init1 = Ethereum::Initializer.new("#{ENV["PWD"]}/contracts/DigixbotConfiguration.sol", @client)
     @contract_init1.build_all
-    @contract_init2 = Ethereum::Initializer.new("#{ENV["PWD"]}/contracts/DigixbotConfiguration.sol", @client)
+    @digixbotconfiguration = DigixbotConfiguration.new
+    @contract_init2 = Ethereum::Initializer.new("#{ENV["PWD"]}/contracts/DigixbotUsers.sol", @client)
     @contract_init2.build_all
     @digixbotusers = DigixbotUsers.new
-    @digixbotconfiguration = DigixbotConfiguration.new
     @accounts = @digixbotusers.connection.accounts["result"]
     @coinbase = @digixbotusers.connection.coinbase["result"]
     @user1 = @accounts[1]
@@ -56,16 +56,23 @@ RSpec.describe "DigixbotUsers" do
 
     end
 
-    describe "setUsersContract() and getUsersContract()" do
+    describe "addUser(), setUserAccount(), getUserId(), and getUserAccount()" do
 
-      it "should set the userscontract to @user2" do
-        expect(true).to be(true)
+      it "should add a new user" do
+        @digixbotusers.as(@user1)
+        @digixbotusers.transact_and_wait_add_user("eufemio")
+        @digixbotusers.transact_and_wait_set_user_account("eufemio", @user2)
+        expect(@digixbotusers.call_get_user_id(@user2)[:formatted][0]).to eq("eufemio")
+        expect(@digixbotusers.call_get_user_account("eufemio")[:formatted][0]).to eq(@user2)
       end
 
-      it "should only allow owner to call it" do
-        expect(true).to be(true)
+      it "should not allow anyone but the bot account to change user information" do
+        @digixbotusers.as(@user2)
+        @digixbotusers.transact_and_wait_set_user_account("eufemio", @user3)
+        expect(@digixbotusers.call_get_user_id(@user2)[:formatted][0]).to eq("eufemio")
+        expect(@digixbotusers.call_get_user_account("eufemio")[:formatted][0]).to eq(@user2)
       end
-
+      
     end
 
   end
