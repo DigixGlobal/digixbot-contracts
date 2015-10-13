@@ -22,6 +22,16 @@ contract Coin {
   function sendCoin(bytes32 _sender,bytes32 _recipient,uint256 _amt);
 }
 
+contract DigixbotUsers {
+  function getBotContract() returns(address );
+  function setUserAccount(bytes32 _id,address _account);
+  function getUserId(address _account) returns(bytes32 );
+  function getUserAccount(bytes32 _id) returns(address );
+  function getOwner() returns(address );
+  function addUser(bytes32 _id);
+  function getConfig() returns(address );
+}
+
 
 contract Digixbot {
   address owner;
@@ -36,6 +46,19 @@ contract Digixbot {
 
   function getConfig() public returns (address) {
     return config;
+  }
+
+  function addUser(bytes4 _userid) ifowner {
+    DigixbotUsers(getUsersContract()).addUser(_userid); 
+  }
+
+  function setUserAccount(bytes32 _userid, address _account) ifowner {
+    DigixbotUsers(getUsersContract()).setUserAccount(_userid, _account);
+  }
+
+
+  function getUsersContract() public returns (address) {
+    return DigixbotConfiguration(config).getUsersContract();
   }
 
   function getCoinWallet(bytes4 _coin) public returns(address) {

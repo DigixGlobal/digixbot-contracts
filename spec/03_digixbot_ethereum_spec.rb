@@ -55,14 +55,15 @@ RSpec.describe "DigixbotEthereum" do
 
     end
 
-    context "getUserId()" do
+    context "getUserId() and getUserAcount()" do
 
-      it "should return a user ID from an address" do
+      it "should return a user ID from an address or address from a user ID" do
         user_id = SecureRandom.hex(4)
         @digixbot_users.as(@owner)
         @digixbot_users.transact_and_wait_add_user(user_id)
         @digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
         expect(@digixbot_ethereum.call_get_user_id(@user1)[:formatted][0]).to eq(user_id)
+        expect(@digixbot_ethereum.call_get_user_account(user_id)[:formatted][0]).to eq(@user1)
       end
 
     end

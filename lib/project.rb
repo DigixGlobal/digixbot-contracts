@@ -5,7 +5,7 @@ require 'pry'
 
 class Project
 
-  CONTRACTS = %w(DigixbotConfiguration DigixbotUsers DigixbotEthereum)
+  CONTRACTS = %w(DigixbotConfiguration DigixbotUsers DigixbotEthereum Digixbot)
   
   CONTRACTS.each do |contract|
     self.send :attr_accessor, contract.underscore.to_sym

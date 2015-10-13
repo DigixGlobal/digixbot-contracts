@@ -3,3 +3,4 @@
 bin/rspec spec/01_digibot_configuration_spec.rb
 bin/rspec spec/02_digixbot_users_spec.rb
 bin/rspec spec/03_digixbot_ethereum_spec.rb
+bin/rspec spec/04_digixbot_spec.rb

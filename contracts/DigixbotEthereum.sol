@@ -52,6 +52,10 @@ contract DigixbotEthereum {
     return DigixbotUsers(getUsersContract()).getUserId(_address);
   }
 
+  function getUserAccount(bytes32 _userid) public returns(address) {
+    return DigixbotUsers(getUsersContract()).getUserAccount(_userid);
+  }
+
   modifier ifbot { if (msg.sender == getBotContract()) _ }
   modifier ifusers { if (msg.sender == getUsersContract()) _ }
 
@@ -69,7 +73,15 @@ contract DigixbotEthereum {
   function withdrawCoin(bytes32 _user, uint _amount) ifbot {
     if (balances[_user] >= _amount) {
       balances[_user] -= _amount;
-      this.send(_amount);
+        
+    }
+  }
+
+  function withdrawCoinExternal(uint _amount) {
+    bytes32 _requester = getUserId(msg.sender);
+    if (balances[_requester] >= _amount) {
+      balances[_requester] -= _amount;
+      address(msg.sender).send(_amount);
     }
   }
 
