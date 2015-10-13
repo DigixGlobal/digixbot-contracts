@@ -95,20 +95,20 @@ RSpec.describe "DigixbotConfiguration" do
 
     end
 
-    context "addCurrency() and getCurrencyWallet()" do
+    context "addCoin() and getCoinWallet()" do
 
-      it "should add a new currency" do
+      it "should add a new coin" do
         @digixbot_configuration.as(@owner)
-        @digixbot_configuration.transact_and_wait_add_currency("eth", @user3)
-        expect(@digixbot_configuration.call_get_currency_wallet("eth")[:formatted][0]).to eq(@user3)
+        @digixbot_configuration.transact_and_wait_add_coin("eth", @user3)
+        expect(@digixbot_configuration.call_get_coin_wallet("eth")[:formatted][0]).to eq(@user3)
       end
 
-      it "should not add an existing currency" do
+      it "should not add an existing coin" do
         @digixbot_configuration.as(@owner)
-        @digixbot_configuration.transact_and_wait_add_currency("eth", @user1)
-        expect(@digixbot_configuration.call_get_currency_wallet("eth")[:formatted][0]).not_to eq(@user1)
-        @digixbot_configuration.transact_and_wait_add_currency("dgx", @user3)
-        expect(@digixbot_configuration.call_get_currency_wallet("dgx")[:formatted][0]).to eq(@user3)
+        @digixbot_configuration.transact_and_wait_add_coin("eth", @user1)
+        expect(@digixbot_configuration.call_get_coin_wallet("eth")[:formatted][0]).not_to eq(@user1)
+        @digixbot_configuration.transact_and_wait_add_coin("dgx", @user3)
+        expect(@digixbot_configuration.call_get_coin_wallet("dgx")[:formatted][0]).to eq(@user3)
       end
 
     end
