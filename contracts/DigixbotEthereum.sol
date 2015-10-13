@@ -10,6 +10,17 @@ contract DigixbotConfiguration {
   function addCurrency(bytes4 _name,address _wallet);
 }
 
+contract DigixbotUsers {
+  function DigixbotUsers(address _config);
+  function getBotContract() returns(address );
+  function setUserAccount(bytes32 _id,address _account);
+  function getUserId(address _account) returns(bytes32 );
+  function getUserAccount(bytes32 _id)returns(address );
+  function getOwner()returns(address );
+  function addUser(bytes32 _id);
+  function getConfig()returns(address );
+}
+
 contract DigixbotEthereum {
 
   address config;

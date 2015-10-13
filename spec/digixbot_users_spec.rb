@@ -18,13 +18,17 @@ RSpec.describe "DigixbotUsers" do
 
   describe "Contract Construction and Deployment" do
 
-    it "Should produce a correct binary after deployment" do
-      expect(@digixbot_users.deployment.valid_deployment).to be(true)
+    context "binary deployment" do
+
+      it "should be correct" do
+        expect(@digixbot_users.deployment.valid_deployment).to be(true)
+      end
+
     end
 
     context "getConfig()" do
 
-      it "Should have the configuration address set during deployment" do
+      it "should return the address for DigixbotConfiguration" do
         expect(@digixbot_users.call_get_config[:formatted][0]).to eq(@configuration_address)
       end
 
@@ -32,7 +36,7 @@ RSpec.describe "DigixbotUsers" do
 
     context "getBotContract()" do
 
-      it "Should set the deployer as the owner at deployment" do
+      it "should return the address for Digixbot" do
         expect(@digixbot_users.call_get_owner[:formatted][0]).to eq(@owner)
       end
 

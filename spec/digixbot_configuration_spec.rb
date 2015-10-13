@@ -14,14 +14,20 @@ RSpec.describe "DigixbotConfiguration" do
 
   describe "Contract Construction and Deployment" do
 
-    it "Should produce a correct binary after deployment" do
-      expect(@digixbot_configuration.deployment.valid_deployment).to be(true)
+    context "binary deployment" do
+
+      it "should be valid" do
+        expect(@digixbot_configuration.deployment.valid_deployment).to be(true)
+      end
+
     end
 
     context "getOwner()" do
-      it "Should set the deployer as owner at deployment" do
-        expect(true).to be(true)
+
+      it "should return the address for @owner" do
+        expect(@digixbot_configuration.call_get_owner[:formatted][0]).to be(true)
       end
+
     end
 
   end
