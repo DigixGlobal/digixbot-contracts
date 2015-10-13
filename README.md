@@ -5,10 +5,10 @@
 
 ## Contents
 
-**DigixbotConfiguration**: Top-level configuration
-**DigixbotUsers**: User registry
-**DigixbotEthereum**: Ethereum wallet contract
-**Digixbot**: Main interface contract used by the Digixbot service
+* **DigixbotConfiguration**: Top-level configuration
+* **DigixbotUsers**: User registry
+* **DigixbotEthereum**: Ethereum wallet contract
+* **Digixbot**: Main interface contract used by the Digixbot service
 
 ## Features
 
