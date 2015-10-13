@@ -43,23 +43,19 @@ contract Digixbot {
   }
 
   function sendCoin(bytes4 _coin, bytes4 _from, bytes4 _to, uint _amount) ifowner {
-    address coinwallet = getCoinWallet(_coin);
-    Coin(coinwallet).sendCoin(_from, _to, _amount); 
+    Coin(getCoinWallet(_coin)).sendCoin(_from, _to, _amount); 
   }
     
   function withdrawCoin(bytes4 _coin, bytes32 _userid, uint _amount) ifowner {
-    address coinwallet = getCoinWallet(_coin);
-    Coin(coinwallet).withdrawCoin(_userid, _amount);
+    Coin(getCoinWallet(_coin)).withdrawCoin(_userid, _amount);
   }
 
   function getCoinBalance(bytes4 _coin, bytes32 _userid) public returns(uint) {
-    address coinwallet = getCoinWallet(_coin);
-    return Coin(coinwallet).getBalance(_userid);
+    return Coin(getCoinWallet(_coin)).getBalance(_userid);
   }
 
   function getTotalBalance(bytes4 _coin) public returns(uint) {
-    address coinwallet = getCoinWallet(_coin);
-    return Coin(coinwallet).totalBalance();
+    return Coin(getCoinWallet(_coin)).totalBalance();
   }
 
 }
