@@ -1,15 +1,9 @@
 contract DigixbotConfiguration {
 
-  struct CurrencyFunctions {
-    bytes4 sendFunction;
-    bytes4 withdrawFunction;
-  }
-
-  struct Currency {
+  struct Coin {
     bytes4 name;
     address wallet;
     bool locked;
-    CurrencyFunctions currencyFunctions;
   }
 
   address owner;
@@ -17,7 +11,7 @@ contract DigixbotConfiguration {
   address userscontract;
   bool locked;
 
-  mapping(bytes4 => Currency) currencies;
+  mapping(bytes4 => Coin) coins;
 
   modifier ifowner { if (msg.sender == owner) _ }
   modifier unlesslocked { if (locked == false) _ }
@@ -43,16 +37,16 @@ contract DigixbotConfiguration {
     userscontract = _userscontract;
   }
 
-  function getUsersContract() public returns (address _uca) {
-    _uca = userscontract;
+  function getUsersContract() public returns (address) {
+    return userscontract;
   }
 
   function lockConfiguration() ifowner {
     locked = true;
   }
 
-  function addCurrency(bytes4 _name, address _wallet) ifowner {
-    Currency _cta = currencies[_name];
+  function addCoin(bytes4 _name, address _wallet) ifowner {
+    Coin _cta = coins[_name];
     if (_cta.locked == false) {
       _cta.name = _name;
       _cta.wallet = _wallet;
@@ -60,9 +54,8 @@ contract DigixbotConfiguration {
     }
   }
 
-  function getCurrencyWallet(bytes4 _currency) public constant returns (address _ca) {
-    Currency _ccy = currencies[_currency];
-    _ca = _ccy.wallet;
+  function getCoinWallet(bytes4 _coin) public constant returns (address) {
+    return coins[_coin].wallet;
   }
 
 } 

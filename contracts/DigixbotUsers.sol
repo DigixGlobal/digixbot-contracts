@@ -2,12 +2,12 @@ contract DigixbotConfiguration {
   function DigixbotConfiguration();
   function lockConfiguration();
   function getBotContract() returns(address );
-  function getCurrencyWallet(bytes4 _currency) constant returns(address _ca);
-  function getOwner()constant returns(address );
+  function getCoinWallet(bytes4 _coin) constant returns(address );
+  function addCoin(bytes4 _name,address _wallet);
+  function getOwner() constant returns(address );
   function setUsersContract(address _userscontract);
-  function getUsersContract()returns(address _uca);
+  function getUsersContract() returns(address );
   function setBotContract(address _botcontract);
-  function addCurrency(bytes4 _name,address _wallet);
 }
 
 contract DigixbotUsers {

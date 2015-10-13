@@ -2,12 +2,12 @@ contract DigixbotConfiguration {
   function DigixbotConfiguration();
   function lockConfiguration();
   function getBotContract() returns(address );
-  function getCurrencyWallet(bytes4 _currency) constant returns(address _ca);
-  function getOwner()constant returns(address );
+  function getCoinWallet(bytes4 _coin) constant returns(address );
+  function addCoin(bytes4 _name,address _wallet);
+  function getOwner() constant returns(address );
   function setUsersContract(address _userscontract);
-  function getUsersContract()returns(address _uca);
+  function getUsersContract() returns(address );
   function setBotContract(address _botcontract);
-  function addCurrency(bytes4 _name,address _wallet);
 }
 
 contract DigixbotUsers {
@@ -15,10 +15,10 @@ contract DigixbotUsers {
   function getBotContract() returns(address );
   function setUserAccount(bytes32 _id,address _account);
   function getUserId(address _account) returns(bytes32 );
-  function getUserAccount(bytes32 _id)returns(address );
-  function getOwner()returns(address );
+  function getUserAccount(bytes32 _id) returns(address );
+  function getOwner() returns(address );
   function addUser(bytes32 _id);
-  function getConfig()returns(address );
+  function getConfig() returns(address );
 }
 
 contract DigixbotEthereum {
@@ -55,18 +55,18 @@ contract DigixbotEthereum {
   modifier ifbot { if (msg.sender == getBotContract()) _ }
   modifier ifusers { if (msg.sender == getUsersContract()) _ }
 
-  function deposit(bytes32 _uid, uint _amt) ifbot {
+  function depositCoin(bytes32 _uid, uint _amt) ifbot {
     balances[_uid] += _amt;
   }
 
-  function send(bytes32 _sender, bytes32 _recipient, uint _amt) ifbot {
+  function sendCoin(bytes32 _sender, bytes32 _recipient, uint _amt) ifbot {
     if (balances[_sender] > _amt) {
       balances[_sender] -= _amt;
       balances[_recipient] += _amt;
     }
   }
 
-  function withdraw(bytes32 _user, uint _amount) ifbot {
+  function withdrawCoin(bytes32 _user, uint _amount) ifbot {
     if (balances[_user] >= _amount) {
       balances[_user] -= _amount;
       this.send(_amount);
