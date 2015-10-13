@@ -6,4 +6,6 @@ contract Digixbot {
     owner = msg.sender;
     config = _config;
   }
+
+  
 }

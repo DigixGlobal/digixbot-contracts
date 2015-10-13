@@ -12,15 +12,16 @@ RSpec.describe "DigixbotUsers" do
     @digixbot_configuration.as(@owner)
     @digixbot_users.as(@owner)
     @digixbot_configuration.deploy_and_wait(120)
-    @configuration_address = @digixbot_configuration.address
+    @configuration_address = @digixbot_configuration.deployment.contract_address
     @digixbot_users.deploy_and_wait(120, @configuration_address)
+    @digixbot_configuration.transact_and_wait_set_users_contract(@digixbot_users.deployment.contract_address)
   end
 
   describe "Contract Construction and Deployment" do
 
-    context "binary deployment" do
+    context "Binary" do
 
-      it "should be correct" do
+      it "should be valid" do
         expect(@digixbot_users.deployment.valid_deployment).to be(true)
       end
 

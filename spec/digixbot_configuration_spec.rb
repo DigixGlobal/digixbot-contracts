@@ -14,7 +14,7 @@ RSpec.describe "DigixbotConfiguration" do
 
   describe "Contract Construction and Deployment" do
 
-    context "binary deployment" do
+    context "binary" do
 
       it "should be valid" do
         expect(@digixbot_configuration.deployment.valid_deployment).to be(true)
@@ -25,7 +25,7 @@ RSpec.describe "DigixbotConfiguration" do
     context "getOwner()" do
 
       it "should return the address for @owner" do
-        expect(@digixbot_configuration.call_get_owner[:formatted][0]).to be(true)
+        expect(@digixbot_configuration.call_get_owner[:formatted][0]).to eq(@owner)
       end
 
     end
@@ -36,7 +36,7 @@ RSpec.describe "DigixbotConfiguration" do
 
     context "setBotContract() and getBotContract()" do
 
-      it "should set the botcontract variable to @owner" do
+      it "should set the botcontract variable to @bot" do
         @digixbot_configuration.transact_and_wait_set_bot_contract(@owner)
         expect(@digixbot_configuration.call_get_bot_contract[:formatted][0]).to eq(@owner)
       end

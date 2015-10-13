@@ -18,11 +18,12 @@ RSpec.describe "DigixbotEthereum" do
     @digixbot_users.deploy_and_wait(120, @configuration_address)
     @digixbot_ethereum.deploy_and_wait(120, @configuration_address)
     @digixbot_configuration.transact_and_wait_set_users_contract(@digixbot_users.address)
+    @digixbot_configuration.transact_and_wait_set_bot_contract(@owner)
   end
 
   describe "Contract Construction and Deployment" do
 
-    context "binary deployment" do
+    context "Binary" do
 
       it "should be valid" do
         expect(@digixbot_ethereum.deployment.valid_deployment).to be(true)
@@ -47,6 +48,13 @@ RSpec.describe "DigixbotEthereum" do
         pending "Digixbot does not exist yet"
         expect(false).to be(true)
       end
+    end
+
+    context "getUserId()" do
+      user_id = SecureRandom.hex(4)
+      @digixbot_users.transact_and_wait_add_user(user_id)
+      @digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
+      expect(@digixbot_ethereum.call_get_user_id[:formatted][0]).to eq(@user1)
     end
     
   end
