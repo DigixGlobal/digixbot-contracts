@@ -56,7 +56,6 @@ contract Digixbot {
     DigixbotUsers(getUsersContract()).setUserAccount(_userid, _account);
   }
 
-
   function getUsersContract() public returns (address) {
     return DigixbotConfiguration(config).getUsersContract();
   }

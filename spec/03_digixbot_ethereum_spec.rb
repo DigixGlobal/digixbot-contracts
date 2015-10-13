@@ -123,6 +123,15 @@ RSpec.describe "DigixbotEthereum" do
       end
 
     end
+
+    context "withdrawCoinExternal()" do
+
+      it "should withdraw a given amount of coin to the user's address" do
+        pending "WIP"
+        expoect(false).to be(true)
+      end
+
+    end
     
   end
 

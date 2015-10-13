@@ -1,4 +1,7 @@
-# Digixbot Solidity Contracts
+# Digixbot Solidity Contracts for Ethereum
+
+![DigixBot at your service](http://i.imgur.com/kKKP2xj.jpg)
+
 
 ## Contents
 
@@ -24,7 +27,7 @@ rake contracts:deploy
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/DigixGlobal/ethereum-ruby. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/DigixGlobal/digixbot-contracts. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
 
 ## License
 

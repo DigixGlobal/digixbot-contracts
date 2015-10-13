@@ -62,8 +62,7 @@ contract DigixbotUsers {
   }
 
   function getUserAccount(bytes32 _id) public returns (address) {
-    User _user = users[_id];
-    return _user.account;
+    return users[_id].account;
   }
 
 }
