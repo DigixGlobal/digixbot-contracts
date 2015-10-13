@@ -1,19 +1,35 @@
+contract DigixbotConfiguration {
+  function DigixbotConfiguration();
+  function lockConfiguration();
+  function getBotContract() returns(address );
+  function getCurrencyWallet(bytes4 _currency) constant returns(address _ca);
+  function getOwner()constant returns(address );
+  function setUsersContract(address _userscontract);
+  function getUsersContract()returns(address _uca);
+  function setBotContract(address _botcontract);
+  function addCurrency(bytes4 _name,address _wallet);
+}
+
 contract DigixbotEthereum {
 
   address config;
 
-  mapping(uint => uint) balances;
+  mapping(bytes32 => uint) balances;
 
   function DigixbotEthereum(address _config) {
     config = _config;
   }
 
+  function getConfig() public returns (address) {
+    return config;
+  }
+
   function getUsersContract() public returns (address) {
-    address(config).call("d0f46c0b");
+    return DigixbotConfiguration(config).getUsersContract();
   }
 
   function getBotContract() public returns (address) {
-    address(config).call("0f8b70c9");
+    return DigixbotConfiguration(config).getBotContract();
   }
 
   modifier ifbot { if (msg.sender == getBotContract()) _ }
@@ -23,11 +39,7 @@ contract DigixbotEthereum {
     balances[_uid] += _amt;
   }
 
-  /// @notice Send coins to a user's account
-  /// @param _sender Sender's User ID
-  /// @param _recipient Recipient's User ID
-  /// @param _amt Amount to send
-  function send(bytes32 _sender, bytes32 _recipient, uint _amt) ifusers {
+  function send(bytes32 _sender, bytes32 _recipient, uint _amt) ifbot {
     if (balances[_sender] > _amt) {
       balances[_sender] -= _amt;
       balances[_recipient] += _amt;
@@ -41,8 +53,6 @@ contract DigixbotEthereum {
     }
   }
 
-  /// @notice Get users's non-multisignature account balance
-  /// @param _uid User ID of user
   function getBalance(bytes32 _uid) public returns (uint) {
     return balances[_uid];
   }
@@ -50,7 +60,5 @@ contract DigixbotEthereum {
   function totalBalance() public returns (uint) {
     return this.balance;
   }
-
-
 
 }

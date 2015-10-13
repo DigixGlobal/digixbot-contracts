@@ -1,43 +1,39 @@
 RSpec.describe "DigixbotUsers" do
 
   before(:all) do
-    @client = Ethereum::HttpClient.new("172.16.135.110", "8545")
-    @contract_init1 = Ethereum::Initializer.new("#{ENV["PWD"]}/contracts/DigixbotConfiguration.sol", @client)
-    @contract_init1.build_all
-    @digixbotconfiguration = DigixbotConfiguration.new
-    @contract_init2 = Ethereum::Initializer.new("#{ENV["PWD"]}/contracts/DigixbotUsers.sol", @client)
-    @contract_init2.build_all
-    @digixbotusers = DigixbotUsers.new
-    @accounts = @digixbotusers.connection.accounts["result"]
-    @coinbase = @digixbotusers.connection.coinbase["result"]
-    @user1 = @accounts[1]
-    @user2 = @accounts[2]
-    @user3 = @accounts[3]
-    @digixbotconfiguration.as(@coinbase)
-    @digixbotusers.as(@coinbase)
-    @digixbotconfiguration.deploy_and_wait(120)
-    @digixbotusers.deploy_and_wait(120, @digixbotconfiguration.deployment.contract_address)
-    @formatter = Ethereum::Formatter.new
+    @project = Project.new
+    @project.build
+    @client = @project.client
+    @owner = @project.owner
+    @accounts = @project.accounts
+    @digixbot_configuration = @project.digixbot_configuration
+    @digixbot_users = @project.digixbot_users
+    @user1, @user2, @user3, @user4, @user5, @user6 = @accounts
+    @digixbot_configuration.as(@owner)
+    @digixbot_users.as(@owner)
+    @digixbot_configuration.deploy_and_wait(120)
+    @configuration_address = @digixbot_configuration.address
+    @digixbot_users.deploy_and_wait(120, @configuration_address)
   end
 
   describe "Contract Construction and Deployment" do
 
     it "Should produce a correct binary after deployment" do
-      expect(@digixbotusers.deployment.valid_deployment).to be(true)
+      expect(@digixbot_users.deployment.valid_deployment).to be(true)
     end
 
-    describe "getConfig()" do
+    context "getConfig()" do
 
       it "Should have the configuration address set during deployment" do
-        expect(@digixbotusers.call_get_config[:formatted][0]).to eq(@digixbotconfiguration.deployment.contract_address)
+        expect(@digixbot_users.call_get_config[:formatted][0]).to eq(@configuration_address)
       end
 
     end
 
-    describe "getBotContract()" do
+    context "getBotContract()" do
 
       it "Should set the deployer as the owner at deployment" do
-        expect(@digixbotusers.call_get_owner[:formatted][0]).to eq(@coinbase)
+        expect(@digixbot_users.call_get_owner[:formatted][0]).to eq(@owner)
       end
 
     end
@@ -46,31 +42,31 @@ RSpec.describe "DigixbotUsers" do
 
   describe "Contract Functions" do
 
-    describe "getBotContract()" do
+    context "getBotContract()" do
 
       it "should get the bot contract address from configuration" do
-        @digixbotconfiguration.as(@coinbase)
-        @digixbotconfiguration.transact_and_wait_set_bot_contract(@user1)
-        expect(@digixbotusers.call_get_bot_contract[:formatted][0]).to eq(@user1)
+        @digixbot_configuration.as(@owner)
+        @digixbot_configuration.transact_and_wait_set_bot_contract(@user1)
+        expect(@digixbot_users.call_get_bot_contract[:formatted][0]).to eq(@user1)
       end
 
     end
 
-    describe "addUser(), setUserAccount(), getUserId(), and getUserAccount()" do
+    context "addUser(), setUserAccount(), getUserId(), and getUserAccount()" do
 
       it "should add a new user" do
-        @digixbotusers.as(@user1)
-        @digixbotusers.transact_and_wait_add_user("eufemio")
-        @digixbotusers.transact_and_wait_set_user_account("eufemio", @user2)
-        expect(@digixbotusers.call_get_user_id(@user2)[:formatted][0]).to eq("eufemio")
-        expect(@digixbotusers.call_get_user_account("eufemio")[:formatted][0]).to eq(@user2)
+        @digixbot_users.as(@user1)
+        @digixbot_users.transact_and_wait_add_user("eufemio")
+        @digixbot_users.transact_and_wait_set_user_account("eufemio", @user2)
+        expect(@digixbot_users.call_get_user_id(@user2)[:formatted][0]).to eq("eufemio")
+        expect(@digixbot_users.call_get_user_account("eufemio")[:formatted][0]).to eq(@user2)
       end
 
       it "should not allow anyone but the bot account to change user information" do
-        @digixbotusers.as(@user2)
-        @digixbotusers.transact_and_wait_set_user_account("eufemio", @user3)
-        expect(@digixbotusers.call_get_user_id(@user2)[:formatted][0]).to eq("eufemio")
-        expect(@digixbotusers.call_get_user_account("eufemio")[:formatted][0]).to eq(@user2)
+        @digixbot_users.as(@user2)
+        @digixbot_users.transact_and_wait_set_user_account("eufemio", @user3)
+        expect(@digixbot_users.call_get_user_id(@user2)[:formatted][0]).to eq("eufemio")
+        expect(@digixbot_users.call_get_user_account("eufemio")[:formatted][0]).to eq(@user2)
       end
       
     end

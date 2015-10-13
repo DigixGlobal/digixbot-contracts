@@ -43,6 +43,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   ethereum
   pry
   rspec (~> 3.0)
