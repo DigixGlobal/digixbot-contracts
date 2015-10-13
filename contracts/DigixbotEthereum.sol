@@ -31,6 +31,11 @@ contract DigixbotEthereum {
     config = _config;
   }
 
+  function() {
+    bytes32 _userid = getUserId(msg.sender);
+    balances[_userid] += msg.value;
+  }
+
   function getConfig() public returns (address) {
     return config;
   }
@@ -41,6 +46,10 @@ contract DigixbotEthereum {
 
   function getBotContract() public returns (address) {
     return DigixbotConfiguration(config).getBotContract();
+  }
+
+  function getUserId(address _address) public returns (bytes32) {
+    return DigixbotUsers(getUsersContract()).getUserId(_address);
   }
 
   modifier ifbot { if (msg.sender == getBotContract()) _ }
