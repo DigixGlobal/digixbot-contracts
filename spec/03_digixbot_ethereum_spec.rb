@@ -19,6 +19,7 @@ RSpec.describe "DigixbotEthereum" do
     @digixbot_ethereum.deploy_and_wait(120, @configuration_address)
     @digixbot_configuration.transact_and_wait_set_users_contract(@digixbot_users.address)
     @digixbot_configuration.transact_and_wait_set_bot_contract(@owner)
+    @digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address)
   end
 
   describe "Contract Construction and Deployment" do
@@ -91,7 +92,6 @@ RSpec.describe "DigixbotEthereum" do
           @digixbot_users.as(@owner)
           @digixbot_users.transact_and_wait_add_user(user_id)
           @digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
-          @digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address)
           @digixbot_ethereum.transact_and_wait_deposit_coin(user_id, amount) 
           expect(@digixbot_ethereum.call_get_balance(user_id)[:formatted][0]).to eq(amount)
         end

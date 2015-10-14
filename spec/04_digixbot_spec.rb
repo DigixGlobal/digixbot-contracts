@@ -22,6 +22,7 @@ RSpec.describe "Digixbot" do
     @digixbot.deploy_and_wait(120, @configuration_address)
     @digixbot_configuration.transact_and_wait_set_users_contract(@digixbot_users.address)
     @digixbot_configuration.transact_and_wait_set_bot_contract(@digixbot.address)
+    @digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address)
   end
 
   describe "Contract Construction and Deployment" do
@@ -29,7 +30,7 @@ RSpec.describe "Digixbot" do
     context "Binary" do
 
       it "should be valid" do
-        expect(@digixbot_ethereum.deployment.valid_deployment).to be(true)
+        expect(@digixbot.deployment.valid_deployment).to be(true)
       end
 
     end
@@ -37,7 +38,7 @@ RSpec.describe "Digixbot" do
     context "getConfig()" do
 
       it "should return the address for DigixbotConfiguration" do
-        expect(@digixbot_ethereum.call_get_config[:formatted][0]).to eq(@digixbot_configuration.address)
+        expect(@digixbot.call_get_config[:formatted][0]).to eq(@digixbot_configuration.address)
       end
 
     end
@@ -45,7 +46,7 @@ RSpec.describe "Digixbot" do
     context "getUsersContract()" do
 
       it "should return the address for DigixbotUsers" do
-        expect(@digixbot_ethereum.call_get_users_contract[:formatted][0]).to eq(@digixbot_users.address)
+        expect(@digixbot.call_get_users_contract[:formatted][0]).to eq(@digixbot_users.address)
       end
 
     end
@@ -58,74 +59,80 @@ RSpec.describe "Digixbot" do
 
     end
 
-#    context "getUserId()" do
+    context "getCoinWallet()" do
 
-      #it "should return a user ID from an address" do
-        #user_id = SecureRandom.hex(4)
-        #@digixbot_users.as(@owner)
-        #@digixbot_users.transact_and_wait_add_user(user_id)
-        #@digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
-        #expect(@digixbot_ethereum.call_get_user_id(@user1)[:formatted][0]).to eq(user_id)
-      #end
+      it "should return the address for DigixbotEthereum" do
+        expect(@digixbot.call_get_coin_wallet("eth")[:formatted][0]).to eq(@digixbot_ethereum.address)
+      end
 
-    #end
+    end
 
-    #context "depositCoin() and getBalance()" do
+  end
 
-      #it "should deposit a given amount of coins to user" do
-        #user_id = SecureRandom.hex(4)
-        #amount = SecureRandom.random_number(1000000000)
-        #@digixbot_users.as(@owner)
-        #@digixbot_users.transact_and_wait_add_user(user_id)
-        #@digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
-        #@digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address)
-        #@digixbot_ethereum.transact_and_wait_deposit_coin(user_id, amount) 
-        #expect(@digixbot_ethereum.call_get_balance(user_id)[:formatted][0]).to eq(amount)
+  describe "Contract Functions" do
 
-      #end
+    before(:context) do
+      @digixbot.as(@owner)
+      @digixbot.transact_and_wait_add_user("user1")
+      @digixbot.transact_and_wait_set_user_account("user1", @user1)
+      @digixbot.transact_and_wait_add_user("user2")
+      @digixbot.transact_and_wait_set_user_account("user2", @user2)
+      @digixbot.transact_and_wait_add_user("user3")
+      @digixbot.transact_and_wait_set_user_account("user2", @user2)
+      gas = 200000
+      gas_price = 60000000000
+      sending_amount = 1000000000000000000000
+      sending_amount_hex = "0x" + sending_amount.to_s(16)
+      txid = @digixbot_users.connection.send_transaction({from: @user1, to: @digixbot_ethereum.address, gas: gas, gasPrice: gas_price, value: sending_amount_hex})["result"]
+      transaction = Ethereum::Transaction.new(txid, @digixbot_ethereum.connection, {})
+      transaction.wait_for_miner(1500)
+    end
 
-    #end
-    
-    #context "sendCoin()" do
+    context "addUser(), setUserAccount(), sendCoin() and getCoinBalance()" do
 
-      #it "should send a given amount of coins from sender to recipient" do
-        #@digixbot_users.as(@owner)
-        #sender_id = SecureRandom.hex(4)
-        #recipient_id = SecureRandom.hex(4)
-        #sender_balance = SecureRandom.random_number(1000000000)
-        #recipient_balance = SecureRandom.random_number(1000000000)
-        #sending_amount = SecureRandom.random_number(300)
-        #@digixbot_ethereum.transact_and_wait_deposit_coin(sender_id, sender_balance)
-        #@digixbot_ethereum.transact_and_wait_deposit_coin(recipient_id, recipient_balance)
-        #expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_balance)
-        #expect(@digixbot_ethereum.call_get_balance(recipient_id)[:formatted][0]).to eq(recipient_balance)
-        #@digixbot_ethereum.transact_and_wait_send_coin(sender_id, recipient_id, sending_amount)
-        #sender_expected_balance = sender_balance - sending_amount
-        #recipient_expected_balance = recipient_balance + sending_amount
-        #expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_expected_balance)
-        #expect(@digixbot_ethereum.call_get_balance(recipient_id)[:formatted][0]).to eq(recipient_expected_balance)
-      #end
+      it "should send given amount of a given coin from given sender to given recipient" do
+        @digixbot.as(@owner)
+        sender = "user1"
+        sender_balance_1 = @digixbot.call_get_coin_balance("eth", sender)[:formatted][0]
+        sending_amount = 16000000000000000000
+        recipient = SecureRandom.hex(8)
+        @digixbot_users.transact_and_wait_add_user(recipient)
+        recipient_balance_1 = @digixbot.call_get_coin_balance("eth", recipient)[:formatted][0]
+        @digixbot.transact_and_wait_send_coin("eth", sender, recipient, sending_amount)
+        sender_balance_2 = @digixbot.call_get_coin_balance("eth", sender)[:formatted][0]
+        recipient_balance_2 = @digixbot.call_get_coin_balance("eth", recipient)[:formatted][0]
+        sender_sent = sender_balance_1 - sender_balance_2
+        recipient_received = recipient_balance_2 - recipient_balance_1
+        expect(sender_sent).to eq(recipient_received)
+      end
 
-    #end
+    end
 
-    #context "withdrawCoin()" do
+    context "withdrawCoin()" do
 
-      #it "should withdraw a given amount of coin from user" do
-        #pending "WIP"
-        #expect(false).to be(true)
-      #end
-      
-    #end
+      it "should withdraw given amount for a given coin to user" do
+        @digixbot.as(@owner)
+        withdrawer = "user1"
+        withdrawer_balance_1 = @digixbot.call_get_coin_balance("eth", withdrawer)[:formatted][0]
+        withdrawer_wallet_balance_1 = @digixbot.connection.get_balance(@user1)["result"].hex
+        withdrawal_amount = 3000000000000000000
+        @digixbot.transact_and_wait_withdraw_coin("eth", withdrawer, withdrawal_amount)
+        withdrawer_balance_2 = @digixbot.call_get_coin_balance("eth", withdrawer)[:formatted][0]
+        withdrawer_wallet_balance_2 = @digixbot.connection.get_balance(@user1)["result"].hex
+        expect(withdrawer_wallet_balance_2 - withdrawer_wallet_balance_1).to eq(withdrawal_amount)
+        expect(withdrawer_balance_1 - withdrawer_balance_2).to eq(withdrawal_amount)
+      end
 
-    #context "totalBalance()" do
+    end
 
-      #it "should return the total coin balance held in the wallet" do
-        #pending "WIP"
-        #expect(false).to be(true)
-      #end
+    context "getTotalBalance()" do
 
-    #end
-    
+      it "should return the total balance for a given coin" do
+        expect(@digixbot.call_get_total_balance("eth")[:formatted][0]).to be > 0
+      end
+
+    end
+
   end
 
 end
