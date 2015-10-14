@@ -1,5 +1,6 @@
 ---
-:digixbot_configuration: '0x09ad5b5e881283eff8f5f6c2f45afb1adb273f32'
-:digixbot_users: '0x8b777c77be9d664fea61405bb4cf46ec85f7188a'
-:digixbot_ethereum: '0x556974a05aca70844935ec928e6b97f955d9eb59'
-:digixbot: '0x1815e7148b63accc4e76e0d71f30a7b385bf619c'
+:owner: '0x385acafdb80b71ae001f1dbd0d65e62ec2fff055'
+:digixbot_configuration: '0x8458baaebe23d030bdb9ab93ec55b4f2c2bf01ac'
+:digixbot_users: '0x5387e954040f1b6681689bd8a9d6bab2db05b91a'
+:digixbot_ethereum: '0x0ea534f24135bed6649baf334eba706418a2e067'
+:digixbot: '0x1a7bff8c622cddeafd51c76bbb534b4bc3c7d6c7'

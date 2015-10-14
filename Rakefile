@@ -11,8 +11,8 @@ namespace :contracts do
 
   desc "Deploy all contracts to blockchain"
   task :deploy do
-    p = Project.new
-    p.deploy
+    project = Project.new
+    project.deploy
   end
   
   desc "Test all contracts"
@@ -21,5 +21,14 @@ namespace :contracts do
     system("bin/rspec spec/02_digixbot_users_spec.rb")
     system("bin/rspec spec/03_digixbot_ethereum_spec.rb")
     system("bin/rspec spec/04_digixbot_spec.rb")
+  end
+
+  desc "Access the Digixbot console"
+  task :console do
+    require 'irb'
+    @project = Project.new
+    @project.init("deployment.yml")
+    ARGV.clear
+    IRB.start
   end
 end

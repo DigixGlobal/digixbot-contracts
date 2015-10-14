@@ -29,6 +29,20 @@ class Project
       send "#{contract.underscore}=".to_sym, contract.constantize.new
     end
   end
+  
+  def init(yaml_file)
+    build
+    @configuration = YAML.load_file(yaml_file)
+    @owner = @configuration[:owner]
+    @digixbot_configuration.as(@owner)
+    @digixbot_configuration.at(@configuration[:digixbot_configuration])
+    @digixbot_users.as(@owner)
+    @digixbot_users.at(@configuration[:digixbot_users])
+    @digixbot_ethereum.as(@owner)
+    @digixbot_ethereum.at(@configuration[:digixbot_ethereum])
+    @digixbot.as(@owner)
+    @digixbot.at(@configuration[:digixbot])
+  end
 
   def deploy
     puts "\n"
@@ -48,7 +62,7 @@ class Project
     @digixbot_configuration.transact_and_wait_set_bot_contract(@digixbot.address)
     @digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address) 
     # Write out the deployment yml here to be used by the oracle 
-    @configuration = {digixbot_configuration: @digixbot_configuration.address, digixbot_users: @digixbot_users.address, digixbot_ethereum: @digixbot_ethereum.address, digixbot: @digixbot.address}
+    @configuration = {owner: @owner, digixbot_configuration: @digixbot_configuration.address, digixbot_users: @digixbot_users.address, digixbot_ethereum: @digixbot_ethereum.address, digixbot: @digixbot.address}
     File.open("deployment.yml", 'w') {|f| f.puts @configuration.to_yaml }
     puts "Deployment Summary"
     puts "------------------\n"
