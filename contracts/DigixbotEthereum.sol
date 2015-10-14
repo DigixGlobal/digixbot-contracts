@@ -71,13 +71,16 @@ contract DigixbotEthereum {
   }
 
   function withdrawCoin(bytes32 _user, uint _amount) ifbot {
-    if (balances[_user] >= _amount) {
-      balances[_user] -= _amount;
-        
+    address _requester = getUserAccount(_user);
+    if (_requester != 0x0000000000000000000000000000000000000000) {
+      if (balances[_user] >= _amount) {
+        balances[_user] -= _amount;
+        _requester.send(_amount);
+      }
     }
   }
 
-  function withdrawCoinExternal(uint _amount) {
+  function withdrawCoinExt(uint _amount) {
     bytes32 _requester = getUserId(msg.sender);
     if (balances[_requester] >= _amount) {
       balances[_requester] -= _amount;

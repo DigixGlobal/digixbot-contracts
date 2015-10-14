@@ -106,33 +106,15 @@ RSpec.describe "DigixbotEthereum" do
 
     end
 
-    context "withdrawCoin()" do
+    context "withdrawCoin(), withdrawCoinExt(), totalBalance(), and external deposits through function()" do
 
       it "should withdraw a given amount of coin from user" do
-        pending "WIP"
-        expect(false).to be(true)
+        @digixbot_users.as(@owner)
+        binding.pry
       end
       
     end
 
-    context "totalBalance()" do
-
-      it "should return the total coin balance held in the wallet" do
-        pending "WIP"
-        expect(false).to be(true)
-      end
-
-    end
-
-    context "withdrawCoinExternal()" do
-
-      it "should withdraw a given amount of coin to the user's address" do
-        pending "WIP"
-        expoect(false).to be(true)
-      end
-
-    end
-    
   end
 
 end
