@@ -1,5 +1,6 @@
 require 'ethereum'
 require 'pry'
+require_relative 'lib/project'
 
 
 task :default do
@@ -10,7 +11,8 @@ namespace :contracts do
 
   desc "Deploy all contracts to blockchain"
   task :deploy do
-    puts "Deploying contracts to the blockchain"
+    p = Project.new
+    p.deploy
   end
   
   desc "Test all contracts"
