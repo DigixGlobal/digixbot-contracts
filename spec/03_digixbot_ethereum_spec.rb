@@ -68,56 +68,129 @@ RSpec.describe "DigixbotEthereum" do
 
     end
 
-    context "depositCoin() and getBalance()" do
+  end
 
-      it "should deposit a given amount of coins to user" do
-        user_id = SecureRandom.hex(4)
-        amount = SecureRandom.random_number(1000000000)
+  describe "Contract Functions" do 
+    context "Deposits, Withdrawals, Balances, and Sending" do
+
+      before(:context) do
         @digixbot_users.as(@owner)
-        @digixbot_users.transact_and_wait_add_user(user_id)
-        @digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
-        @digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address)
-        @digixbot_ethereum.transact_and_wait_deposit_coin(user_id, amount) 
-        expect(@digixbot_ethereum.call_get_balance(user_id)[:formatted][0]).to eq(amount)
-
+        @digixbot_users.transact_and_wait_add_user("user1")
+        @digixbot_users.transact_and_wait_set_user_account("user1", @user1)
+        @digixbot_users.transact_and_wait_add_user("user2")
+        @digixbot_users.transact_and_wait_set_user_account("user2", @user2)
+        @digixbot_users.transact_and_wait_add_user("user3")
+        @digixbot_users.transact_and_wait_set_user_account("user2", @user2)
       end
 
-    end
+      context "depositCoin() and getBalance()" do
+
+        it "should deposit a given amount of coins to user" do
+          user_id = SecureRandom.hex(4)
+          amount = SecureRandom.random_number(1000000000)
+          @digixbot_users.as(@owner)
+          @digixbot_users.transact_and_wait_add_user(user_id)
+          @digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
+          @digixbot_configuration.transact_and_wait_add_coin("eth", @digixbot_ethereum.address)
+          @digixbot_ethereum.transact_and_wait_deposit_coin(user_id, amount) 
+          expect(@digixbot_ethereum.call_get_balance(user_id)[:formatted][0]).to eq(amount)
+        end
+
+      end
     
-    context "sendCoin()" do
+      context "sendCoin()" do
 
-      it "should send a given amount of coins from sender to recipient" do
-        @digixbot_users.as(@owner)
-        sender_id = SecureRandom.hex(4)
-        recipient_id = SecureRandom.hex(4)
-        sender_balance = SecureRandom.random_number(1000000000)
-        recipient_balance = SecureRandom.random_number(1000000000)
-        sending_amount = SecureRandom.random_number(300)
-        @digixbot_ethereum.transact_and_wait_deposit_coin(sender_id, sender_balance)
-        @digixbot_ethereum.transact_and_wait_deposit_coin(recipient_id, recipient_balance)
-        expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_balance)
-        expect(@digixbot_ethereum.call_get_balance(recipient_id)[:formatted][0]).to eq(recipient_balance)
-        @digixbot_ethereum.transact_and_wait_send_coin(sender_id, recipient_id, sending_amount)
-        sender_expected_balance = sender_balance - sending_amount
-        recipient_expected_balance = recipient_balance + sending_amount
-        expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_expected_balance)
-        expect(@digixbot_ethereum.call_get_balance(recipient_id)[:formatted][0]).to eq(recipient_expected_balance)
+        it "should send a given amount of coins from sender to recipient" do
+          @digixbot_users.as(@owner)
+          sender_id = SecureRandom.hex(4)
+          recipient_id = SecureRandom.hex(4)
+          sender_balance = SecureRandom.random_number(1000000000)
+          recipient_balance = SecureRandom.random_number(1000000000)
+          sending_amount = SecureRandom.random_number(300)
+          @digixbot_ethereum.transact_and_wait_deposit_coin(sender_id, sender_balance)
+          @digixbot_ethereum.transact_and_wait_deposit_coin(recipient_id, recipient_balance)
+          expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_balance)
+          expect(@digixbot_ethereum.call_get_balance(recipient_id)[:formatted][0]).to eq(recipient_balance)
+          @digixbot_ethereum.transact_and_wait_send_coin(sender_id, recipient_id, sending_amount)
+          sender_expected_balance = sender_balance - sending_amount
+          recipient_expected_balance = recipient_balance + sending_amount
+          expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_expected_balance)
+          expect(@digixbot_ethereum.call_get_balance(recipient_id)[:formatted][0]).to eq(recipient_expected_balance)
+        end
+
       end
 
-    end
+      context "function() (External deposit transactions to DigixbotEthereum)" do
 
-    context "withdrawCoin(), withdrawCoinExt(), totalBalance(), and external deposits through function()" do
+        it "should deposit the received amount to user" do
+          gas = 200000
+          gas_price = 60000000000
+          sending_amount = 1000000000000000000000
+          sending_amount_hex = "0x" + sending_amount.to_s(16)
+          user2_balance_1 = @digixbot_ethereum.call_get_balance("user2")[:formatted][0]
+          txid = @digixbot_users.connection.send_transaction({from: @user2, to: @digixbot_ethereum.address, gas: gas, gasPrice: gas_price, value: sending_amount_hex})["result"]
+          transaction = Ethereum::Transaction.new(txid, @digixbot_ethereum.connection, {})
+          transaction.wait_for_miner(1500)
+          user2_balance_2 = @digixbot_ethereum.call_get_balance("user2")[:formatted][0]
+          expect(user2_balance_2 - user2_balance_1).to eq(sending_amount)
+        end
 
-      it "should withdraw a given amount of coin from user" do
-        @digixbot_users.as(@owner)
-        binding.pry
+      end
+
+      context "withdrawCoinExt() and getBalance()" do
+
+        it "should withdraw amount from transaction sender's account into their external wallet" do
+          @digixbot_ethereum.as(@user2)
+          user2_balance_1 = @digixbot_ethereum.call_get_balance('user2')[:formatted][0]
+          user2_account_balance_1 = @digixbot_users.connection.get_balance(@user2)["result"].hex
+          user2_withdrawal_amount = 5000000000000000000
+          tx = @digixbot_ethereum.transact_and_wait_withdraw_coin_ext(user2_withdrawal_amount)
+          tx_gas_used = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gas"].hex
+          tx_gas_price = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gasPrice"].hex
+          tx_fees = tx_gas_used * tx_gas_price
+          user2_balance_2 = @digixbot_ethereum.call_get_balance('user2')[:formatted][0]
+          user2_account_balance_2 = @digixbot_users.connection.get_balance(@user2)["result"].hex
+          expect(user2_balance_1 - user2_balance_2).to eq(user2_withdrawal_amount)
+          expect(user2_account_balance_2 - user2_account_balance_1).to be_within(tx_fees).of(user2_withdrawal_amount)
+        end
+
+      end
+
+      context "withdrawCoin()" do
+
+        it "should withdraw amount from user's account into their external wallet" do
+          @digixbot_ethereum.as(@owner)
+          user2_balance_1 = @digixbot_ethereum.call_get_balance('user2')[:formatted][0]
+          user2_account_balance_1 = @digixbot_users.connection.get_balance(@user2)["result"].hex
+          user2_withdrawal_amount = 5000000000000000000
+          tx = @digixbot_ethereum.transact_and_wait_withdraw_coin('user2', user2_withdrawal_amount)
+          tx_gas_used = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gas"].hex
+          tx_gas_price = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gasPrice"].hex
+          tx_fees = tx_gas_used * tx_gas_price
+          user2_balance_2 = @digixbot_ethereum.call_get_balance('user2')[:formatted][0]
+          user2_account_balance_2 = @digixbot_users.connection.get_balance(@user2)["result"].hex
+          expect(user2_balance_1 - user2_balance_2).to eq(user2_withdrawal_amount)
+          expect(user2_account_balance_2 - user2_account_balance_1).to be_within(tx_fees).of(user2_withdrawal_amount)
+        end
+
       end
       
-    end
+      context "totalBalance()" do
 
+        it "should show the total ETH balance for contract account" do
+          function_result = @digixbot_ethereum.call_total_balance[:formatted][0]
+          get_balance_result = @digixbot_ethereum.connection.get_balance(@digixbot_ethereum.address)["result"].hex
+          expect(function_result).to eq(get_balance_result)
+        end
+
+      end
+
+    end
+      
   end
 
 end
+
 
 
 

@@ -27,13 +27,20 @@ contract DigixbotEthereum {
 
   mapping(bytes32 => uint) balances;
 
+  event UserIdLogger(bytes32 indexed _debug);
+
   function DigixbotEthereum(address _config) {
     config = _config;
   }
 
   function() {
     bytes32 _userid = getUserId(msg.sender);
+    UserIdLogger(_userid);
     balances[_userid] += msg.value;
+  }
+
+  function depositCoin(bytes32 _userid, uint _amount) ifbot {
+    balances[_userid] += _amount;
   }
 
   function getConfig() public returns (address) {
@@ -58,10 +65,6 @@ contract DigixbotEthereum {
 
   modifier ifbot { if (msg.sender == getBotContract()) _ }
   modifier ifusers { if (msg.sender == getUsersContract()) _ }
-
-  function depositCoin(bytes32 _uid, uint _amt) ifbot {
-    balances[_uid] += _amt;
-  }
 
   function sendCoin(bytes32 _sender, bytes32 _recipient, uint _amt) ifbot {
     if (balances[_sender] > _amt) {
