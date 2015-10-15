@@ -49,7 +49,7 @@ contract Digixbot {
     return config;
   }
 
-  function addUser(bytes4 _userid) ifowner {
+  function addUser(bytes32 _userid) ifowner {
     DigixbotUsers(getUsersContract()).addUser(_userid); 
   }
 
