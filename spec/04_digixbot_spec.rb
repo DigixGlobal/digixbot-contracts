@@ -108,6 +108,21 @@ RSpec.describe "Digixbot" do
 
     end
 
+    context "userCheck()" do
+
+      it "should return true if user exists" do
+        user_that_should_exist = SecureRandom.hex(4)
+        @digixbot.transact_and_wait_add_user(user_that_should_exist)
+        expect(@digixbot.call_user_check(user_that_should_exist)[:formatted][0]).to be(true)
+      end
+
+      it "should return false if user does not exist" do
+        user_that_should_not_exist = SecureRandom.hex(4)
+        expect(@digixbot.call_user_check(user_that_should_not_exist)[:formatted][0]).to be(false)
+      end
+        
+    end
+
     context "withdrawCoin()" do
 
       it "should withdraw given amount for a given coin to user" do

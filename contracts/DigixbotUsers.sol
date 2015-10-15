@@ -15,6 +15,7 @@ contract DigixbotUsers {
   struct User {
     bytes32 id; 
     address account;
+    bool configured;
   }
 
   address owner;
@@ -48,7 +49,12 @@ contract DigixbotUsers {
 
   function addUser(bytes32 _id) ifbot {
     users[_id].id = _id;
+    users[_id].configured = true;
     EventLog(uint(EventTypes.AddUser), _id);
+  }
+
+  function userCheck(bytes32 _id) public returns (bool) {
+    return users[_id].configured;
   }
 
   function setUserAccount(bytes32 _id, address _account) ifbot {

@@ -30,6 +30,7 @@ contract DigixbotUsers {
   function getOwner() returns(address );
   function addUser(bytes32 _id);
   function getConfig() returns(address );
+  function userCheck(bytes32 _id) returns(bool );
 }
 
 
@@ -62,6 +63,10 @@ contract Digixbot {
 
   function getCoinWallet(bytes4 _coin) public returns(address) {
     return DigixbotConfiguration(config).getCoinWallet(_coin);
+  }
+
+  function userCheck(bytes32 _id) public returns(bool) {
+    return DigixbotUsers(getUsersContract()).userCheck(_id);
   }
 
   function sendCoin(bytes4 _coin, bytes4 _from, bytes4 _to, uint _amount) ifowner {

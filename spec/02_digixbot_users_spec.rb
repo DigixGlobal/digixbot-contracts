@@ -76,6 +76,23 @@ RSpec.describe "DigixbotUsers" do
       
     end
 
+    context "userCheck()" do
+
+      it "should be true if user exists" do
+        @digixbot_users.as(@user1)
+        user = SecureRandom.hex(5)
+        @digixbot_users.transact_and_wait_add_user(user)
+        expect(@digixbot_users.call_user_check(user)[:formatted][0]).to be(true)
+      end
+
+      it "should be false if user does not exist" do
+        @digixbot_users.as(@user1)
+        user = SecureRandom.hex(4)
+        expect(@digixbot_users.call_user_check(user)[:formatted][0]).to be(false)
+      end
+
+    end
+
   end
 
 end
