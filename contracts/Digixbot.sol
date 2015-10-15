@@ -69,7 +69,7 @@ contract Digixbot {
     return DigixbotUsers(getUsersContract()).userCheck(_id);
   }
 
-  function sendCoin(bytes4 _coin, bytes4 _from, bytes4 _to, uint _amount) ifowner {
+  function sendCoin(bytes4 _coin, bytes32 _from, bytes32 _to, uint _amount) ifowner {
     Coin(getCoinWallet(_coin)).sendCoin(_from, _to, _amount); 
   }
     
