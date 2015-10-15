@@ -78,12 +78,17 @@ RSpec.describe "Digixbot" do
       @digixbot.transact_and_wait_add_user("user2")
       @digixbot.transact_and_wait_set_user_account("user2", @user2)
       @digixbot.transact_and_wait_add_user("user3")
-      @digixbot.transact_and_wait_set_user_account("user2", @user2)
+      @digixbot.transact_and_wait_set_user_account("user3", @user3)
+      @digixbot.transact_and_wait_add_user("user4")
+      @digixbot.transact_and_wait_set_user_account("user4", @user4)
       gas = 200000
       gas_price = 60000000000
       sending_amount = 30000000000000000000
       sending_amount_hex = "0x" + sending_amount.to_s(16)
       txid = @digixbot_users.connection.send_transaction({from: @user1, to: @digixbot_ethereum.address, gas: gas, gasPrice: gas_price, value: sending_amount_hex})["result"]
+      transaction = Ethereum::Transaction.new(txid, @digixbot_ethereum.connection, {})
+      transaction.wait_for_miner(1500)
+      txid = @digixbot_users.connection.send_transaction({from: @user4, to: @digixbot_ethereum.address, gas: gas, gasPrice: gas_price, value: sending_amount_hex})["result"]
       transaction = Ethereum::Transaction.new(txid, @digixbot_ethereum.connection, {})
       transaction.wait_for_miner(1500)
     end
@@ -127,13 +132,13 @@ RSpec.describe "Digixbot" do
 
       it "should withdraw given amount for a given coin to user" do
         @digixbot.as(@owner)
-        withdrawer = "user1"
+        withdrawer = 'user4'
         withdrawer_balance_1 = @digixbot.call_get_coin_balance("eth", withdrawer)[:formatted][0]
-        withdrawer_wallet_balance_1 = @digixbot.connection.get_balance(@user1)["result"].hex
-        withdrawal_amount = 30000000000000000000
+        withdrawer_wallet_balance_1 = @digixbot.connection.get_balance(@user4)["result"].hex
+        withdrawal_amount = 3000000000000000000
         @digixbot.transact_and_wait_withdraw_coin("eth", withdrawer, withdrawal_amount)
         withdrawer_balance_2 = @digixbot.call_get_coin_balance("eth", withdrawer)[:formatted][0]
-        withdrawer_wallet_balance_2 = @digixbot.connection.get_balance(@user1)["result"].hex
+        withdrawer_wallet_balance_2 = @digixbot.connection.get_balance(@user4)["result"].hex
         expect(withdrawer_wallet_balance_2 - withdrawer_wallet_balance_1).to eq(withdrawal_amount)
         expect(withdrawer_balance_1 - withdrawer_balance_2).to eq(withdrawal_amount)
       end
