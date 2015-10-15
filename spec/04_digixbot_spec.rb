@@ -81,7 +81,7 @@ RSpec.describe "Digixbot" do
       @digixbot.transact_and_wait_set_user_account("user2", @user2)
       gas = 200000
       gas_price = 60000000000
-      sending_amount = 1000000000000000000000
+      sending_amount = 30000000000000000000
       sending_amount_hex = "0x" + sending_amount.to_s(16)
       txid = @digixbot_users.connection.send_transaction({from: @user1, to: @digixbot_ethereum.address, gas: gas, gasPrice: gas_price, value: sending_amount_hex})["result"]
       transaction = Ethereum::Transaction.new(txid, @digixbot_ethereum.connection, {})
@@ -94,7 +94,7 @@ RSpec.describe "Digixbot" do
         @digixbot.as(@owner)
         sender = "user1"
         sender_balance_1 = @digixbot.call_get_coin_balance("eth", sender)[:formatted][0]
-        sending_amount = 16000000000000000000
+        sending_amount = 30000000000000000000
         recipient = SecureRandom.hex(8)
         @digixbot_users.transact_and_wait_add_user(recipient)
         recipient_balance_1 = @digixbot.call_get_coin_balance("eth", recipient)[:formatted][0]
@@ -130,7 +130,7 @@ RSpec.describe "Digixbot" do
         withdrawer = "user1"
         withdrawer_balance_1 = @digixbot.call_get_coin_balance("eth", withdrawer)[:formatted][0]
         withdrawer_wallet_balance_1 = @digixbot.connection.get_balance(@user1)["result"].hex
-        withdrawal_amount = 3000000000000000000
+        withdrawal_amount = 30000000000000000000
         @digixbot.transact_and_wait_withdraw_coin("eth", withdrawer, withdrawal_amount)
         withdrawer_balance_2 = @digixbot.call_get_coin_balance("eth", withdrawer)[:formatted][0]
         withdrawer_wallet_balance_2 = @digixbot.connection.get_balance(@user1)["result"].hex

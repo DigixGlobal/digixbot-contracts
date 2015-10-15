@@ -67,18 +67,22 @@ contract DigixbotEthereum {
   modifier ifusers { if (msg.sender == getUsersContract()) _ }
 
   function sendCoin(bytes32 _sender, bytes32 _recipient, uint _amt) ifbot {
-    if (balances[_sender] > _amt) {
-      balances[_sender] -= _amt;
-      balances[_recipient] += _amt;
+    if (_amt >= 100000000000000000) {
+      if (balances[_sender] >= _amt) {
+        balances[_sender] -= _amt;
+        balances[_recipient] += _amt;
+      }
     }
   }
 
   function withdrawCoin(bytes32 _user, uint _amount) ifbot {
     address _requester = getUserAccount(_user);
     if (_requester != 0x0000000000000000000000000000000000000000) {
-      if (balances[_user] >= _amount) {
-        balances[_user] -= _amount;
-        _requester.send(_amount);
+      if (_amount >= 1000000000000000000) {
+        if (balances[_user] >= _amount) {
+          balances[_user] -= _amount;
+          _requester.send(_amount);
+        }
       }
     }
   }

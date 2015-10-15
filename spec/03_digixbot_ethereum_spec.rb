@@ -88,7 +88,7 @@ RSpec.describe "DigixbotEthereum" do
 
         it "should deposit a given amount of coins to user" do
           user_id = SecureRandom.hex(4)
-          amount = SecureRandom.random_number(1000000000)
+          amount = 50000000000000000000
           @digixbot_users.as(@owner)
           @digixbot_users.transact_and_wait_add_user(user_id)
           @digixbot_users.transact_and_wait_set_user_account(user_id, @user1)
@@ -104,9 +104,9 @@ RSpec.describe "DigixbotEthereum" do
           @digixbot_users.as(@owner)
           sender_id = SecureRandom.hex(4)
           recipient_id = SecureRandom.hex(4)
-          sender_balance = SecureRandom.random_number(1000000000)
-          recipient_balance = SecureRandom.random_number(1000000000)
-          sending_amount = SecureRandom.random_number(300)
+          sender_balance = 22000000000000000000
+          recipient_balance = 33000000000000000000
+          sending_amount = 800000000000000000          
           @digixbot_ethereum.transact_and_wait_deposit_coin(sender_id, sender_balance)
           @digixbot_ethereum.transact_and_wait_deposit_coin(recipient_id, recipient_balance)
           expect(@digixbot_ethereum.call_get_balance(sender_id)[:formatted][0]).to eq(sender_balance)
@@ -125,7 +125,7 @@ RSpec.describe "DigixbotEthereum" do
         it "should deposit the received amount to user" do
           gas = 200000
           gas_price = 60000000000
-          sending_amount = 1000000000000000000000
+          sending_amount = 10000000000000000000
           sending_amount_hex = "0x" + sending_amount.to_s(16)
           user2_balance_1 = @digixbot_ethereum.call_get_balance("user2")[:formatted][0]
           txid = @digixbot_users.connection.send_transaction({from: @user2, to: @digixbot_ethereum.address, gas: gas, gasPrice: gas_price, value: sending_amount_hex})["result"]
@@ -143,7 +143,7 @@ RSpec.describe "DigixbotEthereum" do
           @digixbot_ethereum.as(@user2)
           user2_balance_1 = @digixbot_ethereum.call_get_balance('user2')[:formatted][0]
           user2_account_balance_1 = @digixbot_users.connection.get_balance(@user2)["result"].hex
-          user2_withdrawal_amount = 5000000000000000000
+          user2_withdrawal_amount = 3000000000000000000
           tx = @digixbot_ethereum.transact_and_wait_withdraw_coin_ext(user2_withdrawal_amount)
           tx_gas_used = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gas"].hex
           tx_gas_price = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gasPrice"].hex
@@ -162,7 +162,7 @@ RSpec.describe "DigixbotEthereum" do
           @digixbot_ethereum.as(@owner)
           user2_balance_1 = @digixbot_ethereum.call_get_balance('user2')[:formatted][0]
           user2_account_balance_1 = @digixbot_users.connection.get_balance(@user2)["result"].hex
-          user2_withdrawal_amount = 5000000000000000000
+          user2_withdrawal_amount = 3000000000000000000
           tx = @digixbot_ethereum.transact_and_wait_withdraw_coin('user2', user2_withdrawal_amount)
           tx_gas_used = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gas"].hex
           tx_gas_price = @digixbot_ethereum.connection.get_transaction_by_hash(tx.id)["result"]["gasPrice"].hex
