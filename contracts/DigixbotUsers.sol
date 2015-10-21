@@ -16,6 +16,8 @@ contract DigixbotUsers {
     bytes32 id; 
     address account;
     bool configured;
+    bool lockaccount;
+    bool locktip;
   }
 
   address owner;
@@ -50,6 +52,8 @@ contract DigixbotUsers {
   function addUser(bytes32 _id) ifbot {
     users[_id].id = _id;
     users[_id].configured = true;
+    users[_id].lockaccount = false;
+    users[_id].locktip = false;
     EventLog(uint(EventTypes.AddUser), _id);
   }
 
@@ -61,6 +65,30 @@ contract DigixbotUsers {
     users[_id].account = _account;
     ids[_account] = _id; 
     EventLog(uint(EventTypes.SetAccount), _id);
+  }
+
+  function accountLockCheck(bytes32 _id) public returns (bool) {
+    return users[_id].lockaccount;
+  }
+
+  function lockAccount(bytes32 _id) ifbot {
+    users[_id].lockaccount = true;
+  }
+
+  function unlockAccount(bytes32 _id) ifbot {
+    users[_id].lockaccount = false;
+  }
+
+  function tipLockCheck(bytes32 _id) public returns (bool) {
+    return users[_id].locktip;
+  }
+  
+  function lockTip(bytes32 _id) ifbot {
+    users[_id].locktip = true;
+  }
+
+  function unlockTip(bytes32 _id) ifbot {
+    users[_id].locktip = false;
   }
 
   function getUserId(address _account) public returns (bytes32) {
