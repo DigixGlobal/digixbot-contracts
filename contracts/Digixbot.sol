@@ -26,6 +26,7 @@ contract DigixbotUsers {
   function tipLockCheck(bytes32 _id) returns(bool );
   function getBotContract() returns(address );
   function lockAccount(bytes32 _id);
+  function userAddressCheck(bytes32 _id) returns (bool );
   function userCheck(bytes32 _id) returns(bool );
   function unlockAccount(bytes32 _id);
   function setUserAccount(bytes32 _id,address _account);

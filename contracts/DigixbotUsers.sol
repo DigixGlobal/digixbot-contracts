@@ -62,9 +62,12 @@ contract DigixbotUsers {
   }
 
   function setUserAccount(bytes32 _id, address _account) ifbot {
-    users[_id].account = _account;
-    ids[_account] = _id; 
-    EventLog(uint(EventTypes.SetAccount), _id);
+    bool _acctlock = accountLockCheck(_id);
+    if (_acctlock == false) {
+      users[_id].account = _account;
+      ids[_account] = _id; 
+      EventLog(uint(EventTypes.SetAccount), _id);
+    }
   }
 
   function accountLockCheck(bytes32 _id) public returns (bool) {
@@ -72,7 +75,14 @@ contract DigixbotUsers {
   }
 
   function lockAccount(bytes32 _id) ifbot {
-    users[_id].lockaccount = true;
+    if (userAddressCheck(_id) == true) {
+      users[_id].lockaccount = true;
+    }
+  }
+
+  function userAddressCheck(bytes32 _id) public returns (bool) {
+    address _user = getUserAccount(_id); 
+    return _user != 0x0000000000000000000000000000000000000000;
   }
 
   function unlockAccount(bytes32 _id) ifbot {
@@ -84,7 +94,9 @@ contract DigixbotUsers {
   }
   
   function lockTip(bytes32 _id) ifbot {
-    users[_id].locktip = true;
+    if (userAddressCheck(_id) == true) {
+      users[_id].locktip = true;
+    }
   }
 
   function unlockTip(bytes32 _id) ifbot {
